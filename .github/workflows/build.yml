@@ -49,15 +49,16 @@ jobs:
         cd $GITHUB_WORKSPACE
         git clone --depth=1 https://gitlab.com/simonpunk/susfs4ksu.git
         
-        # 4. Apply SUSFS kernel patches for 4.19
+        # 4. Apply SUSFS kernel patches for 4.19 (Auto-detect patch file)
         cd $GITHUB_WORKSPACE/kernel_workspace
-        cp $GITHUB_WORKSPACE/susfs4ksu/kernel_patches/50_add_susfs_in_kernel-4.14-4.19.patch ./
+        PATCH_FILE=$(ls $GITHUB_WORKSPACE/susfs4ksu/kernel_patches/ | grep -E "50_add_susfs_in_kernel-4.14.*\.patch")
+        cp $GITHUB_WORKSPACE/susfs4ksu/kernel_patches/$PATCH_FILE ./
         cp $GITHUB_WORKSPACE/susfs4ksu/kernel_patches/fs/susfs.c ./fs/
         cp $GITHUB_WORKSPACE/susfs4ksu/kernel_patches/include/linux/susfs.h ./include/linux/
         cp $GITHUB_WORKSPACE/susfs4ksu/kernel_patches/include/linux/susfs_def.h ./include/linux/
         
         # Patching core kernel files
-        patch -p1 < 50_add_susfs_in_kernel-4.14-4.19.patch || echo "Some patches failed or already applied, check logs."
+        patch -p1 < $PATCH_FILE || echo "Some patches failed or already applied, check logs."
 
     - name: Update Defconfig for FinaSU and SUSFS
       run: |
