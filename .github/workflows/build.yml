@@ -36,17 +36,18 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE/kernel_workspace
         
-        # 1. Clone FinaSU directly into KernelSU folder
-        git clone https://github.com/LyraVoid/FinaSU.git KernelSU
+        # 1. Purana KernelSU delete karein aur FinaSU ko uski jagah clone karein
+        rm -rf fs/KernelSU
+        git clone https://github.com/LyraVoid/FinaSU.git fs/KernelSU
         
-        # 2. Inject FinaSU into kernel build system
+        # 2. Inject FinaSU into kernel build system (agar hooks nahi hain toh)
         echo "Injecting Kconfig and Makefile hooks for FinaSU..."
         grep -q "KernelSU" fs/Kconfig || sed -i '/source "fs\/quota\/Kconfig"/a source "fs/KernelSU/Kconfig"' fs/Kconfig
         grep -q "KernelSU" fs/Makefile || sed -i '/obj-$(CONFIG_QUOTA)/a obj-y += KernelSU\/' fs/Makefile
         
-        # 3. Clone SUSFS4KSU patches (SimonPunk base)
+        # 3. Clone SUSFS4KSU patches (GitLab ka Sahi Link)
         cd $GITHUB_WORKSPACE
-        git clone --depth=1 https://github.com/simonpunk/susfs4ksu.git
+        git clone --depth=1 https://gitlab.com/simonpunk/susfs4ksu.git
         
         # 4. Apply SUSFS kernel patches for 4.19
         cd $GITHUB_WORKSPACE/kernel_workspace
@@ -116,4 +117,3 @@ jobs:
       with:
         name: MagicTime-FinaSU-Alioth-MIUI
         path: MagicTime-FinaSU-Alioth-MIUI.zip
-        
